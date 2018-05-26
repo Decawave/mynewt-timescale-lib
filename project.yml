@@ -17,7 +17,7 @@
 # under the License.
 #
 
-project.name: "mynewt-tiemscale-lib"
+project.name: "mynewt-timescale-lib"
 
 project.repositories:
     - apache-mynewt-core

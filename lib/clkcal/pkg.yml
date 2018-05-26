@@ -17,8 +17,8 @@
 # under the License.
 #
 
-pkg.name: lib/timescale
-pkg.description: Core algorithm for ccp timescale applicaitons 
+pkg.name: lib/clkcal
+pkg.description: Clock Cailbration API
 pkg.author: "Paul Kettle <Paul.Kettle@decawave.com>"
 pkg.homepage: "http://www.decawave.com]/"
 pkg.keywords:
@@ -26,6 +26,7 @@ pkg.keywords:
     - uwb
     - ccp
     - timescale
+    - clkcal
     
 pkg.cflags:
     - "-std=gnu99"
@@ -33,5 +34,5 @@ pkg.cflags:
 
 pkg.deps:
     - "@mynewt-dw1000-core/hw/drivers/dw1000"
-pkg.deps.CLOCK_CALIBRATION:
-    - "@mynewt-dw1000-core/hw/drivers/dw1000"
+pkg.deps.TIMESCALE:
+    - "@mynewt-timescale-lib/lib/timescale"

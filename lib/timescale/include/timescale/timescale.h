@@ -35,7 +35,7 @@
 
 typedef struct  _timescale_states_t{
     double time;                             /**< Local time state */
-    double skews;                            /**< Skew parameter  */
+    double skews;                             /**< Skew parameter  */
 #if (TIMESCALE_DYNAMICS == 3)
     double drift;                            /**< Rate of change of Skew  */
 #endif
