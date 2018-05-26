@@ -19,6 +19,21 @@
  * under the License.
  */
 
+/**
+ * @file clkcal.c
+ * @author Paul.Kettle@decawave.com
+ * @date May 25 2018
+ * @brief Clock Calibration toplevel
+ *
+ * @details This is a topleval package for managing Clock Calibration using Clock Calibration Packet (CCP). 
+ * In an RTLS system the Clock Master send a periodic blink which is received by the anchor nodes. The device driver model on the node
+ * handles the ccp frame and schedules a callback for post-processing of the event. The Clock Calibration herein is an example 
+ * of this post-processing. In TDOA-base RTLS system clock synchronization is essential, this can be either wired or wireless depending on the requirements.
+ * In the case of wireless clock synchronization clock skew is estimated from the CCP packets. Depending on the accuracy required and the 
+ * available computational resources two model is available; timescale or linear interpolation.  
+ *
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -47,7 +62,8 @@ static void clkcal_postprocess(struct os_event * ev);
 /*! 
  * @fn clkcal_init(clkcal_instance_t * inst,  dw1000_ccp_instance_t * ccp)
  *
- * @brief Allocate resources for clkcal calibration tasks.   
+ * @brief Allocate resources for the clkcal calibration tasks. Binds resources 
+ * to dw1000_ccp interface and instantiate timescale instance if in use.      
  *
  * input parameters
  * @param inst - clkcal_instance_t *
@@ -75,7 +91,7 @@ clkcal_init(clkcal_instance_t * inst,  dw1000_ccp_instance_t * ccp){
     inst->ccp = (void *) ccp;
 
 #if MYNEWT_VAL(TIMESCALE)
-    double x0[] = {0,1.0};
+    double x0[] = {0,(double)((uint64_t)inst->period * (1 <<16))};
     inst->q[0] = MYNEWT_VAL(TIMESCALE_QVAR);
     inst->q[1] = MYNEWT_VAL(TIMESCALE_QVAR) * 0.1;
     inst->r[0] = MYNEWT_VAL(TIMESCALE_RVAR);
@@ -105,6 +121,9 @@ clkcal_init(clkcal_instance_t * inst,  dw1000_ccp_instance_t * ccp){
 void 
 clkcal_free(clkcal_instance_t * inst){
     assert(inst);  
+
+    dw1000_ccp_set_postprocess((dw1000_ccp_instance_t *)inst->ccp, NULL);
+
 #if MYNEWT_VAL(TIMESCALE)
         timescale_free(inst->timescale);
 #endif
@@ -117,7 +136,8 @@ clkcal_free(clkcal_instance_t * inst){
 /*! 
  * @fn ccp_complate_cb(struct os_event * ev)
  *
- * @brief This serves as a place holder for clkcal processing and by default is creates json string for the event
+ * @brief This function serves as a placeholder for clkcal updates based on ccp observation. The clkcal thread uses timescale 
+ * if available otherwise defaults to linear interpolation. Once complete a post-process event is invoked.     
  *
  * input parameters
  * @param inst - struct os_event * ev * 
@@ -138,13 +158,22 @@ static void ccp_complate_cb(struct os_event * ev){
         ccp_frame_t * frame = ccp->frames[(ccp->idx)%ccp->nframes]; 
         inst->nT = (int16_t)frame->seq_num - (int16_t)previous_frame->seq_num;
         inst->nT = (inst->nT < 0)?0x100+inst->nT:inst->nT;
+       
 
 #if MYNEWT_VAL(TIMESCALE) 
         timescale_instance_t * timescale = inst->timescale; 
         timescale_states_t * states = (timescale_states_t *) (inst->timescale->eke->x); 
+        
+        if (inst->status.valid == 0){
+            states->time = frame->reception_timestamp;
+            states->skew = ((double) ((uint64_t)1 << 16)) / 1e-6; 
+        }
         double T = 1e-6 * inst->period * inst->nT;   // peroid in sec
         inst->status.valid = timescale_main(timescale, frame->reception_timestamp, inst->q, inst->r, T).initialized;
-        inst->skew = states->skews * (1e-6/(1 << 16));
+        inst->skew = states->skew * (1e-6/(1 << 16));
+#else
+        uint64_t interval = (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFF;
+        inst->skew = (double) interval / (double)(inst->nT * ((uint64_t)inst->period * (1 <<16)));
 #endif
     }
 #endif
@@ -156,7 +185,7 @@ static void ccp_complate_cb(struct os_event * ev){
 /*! 
  * @fn clkcal_set_postprocess(clkcal_instance_t * inst * inst, os_event_fn * ccp_postprocess)
  *
- * @briefOverrides the default post-processing behaviors, replacing the JSON stream with an alternative 
+ * @brief Overrides the default post-processing behaviors, replacing the JSON stream with an alternative 
  * or an advanced timescale processing algorithm.
  * 
  * input parameters
@@ -173,7 +202,7 @@ clkcal_set_postprocess(clkcal_instance_t * inst, os_event_fn * postprocess){
 /*! 
  * @fn clkcal_postprocess(struct os_event * ev)
  *
- * @brief This serves as a place holder for timescale processing and by default is creates json string for the event
+ * @brief This function serves as a placeholder for timescale processing and by default creates json string for the event
  *
  * input parameters
  * @param inst - struct os_event *  
@@ -192,12 +221,14 @@ clkcal_postprocess(struct os_event * ev){
     ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
     ccp_frame_t * frame = ccp->frames[(ccp->idx)%ccp->nframes]; 
 
-     printf("{\"utime\":%lu,\"ccp\":[%llu,%llu],\"skew\":%llu,\"nT\":%d}\n", 
+     printf("{\"utime\":%lu,\"ccp\":[%llu,%llu],\"skew\":%llu,\"nT\":[%d,%d,%d]}\n", 
         os_cputime_ticks_to_usecs(os_cputime_get32()),
         frame->reception_timestamp,
         (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFF,
         *(uint64_t *)&inst->skew,
-        inst->nT
+        inst->nT,
+        frame->seq_num,
+        previous_frame->seq_num
     );
 }
 

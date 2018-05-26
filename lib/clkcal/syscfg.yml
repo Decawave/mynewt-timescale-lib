@@ -22,5 +22,7 @@ syscfg.defs:
     CLOCK_CALIBRATION:
         description: 'Enable clock estimation'
         value: 0
+        restrictions: DW1000_CLOCK_CALIBRATION
+        restrictions: CCP_PERIOD
  
   
