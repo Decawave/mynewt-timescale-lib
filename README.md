@@ -23,12 +23,9 @@
 
 ## Overview
 
-Precompiled library for Wireless Clock Calibration. This library for precompilled for for Cortex class M3 devices. The Library work inconjunction with Clock Calibration Packets (CCP) sent by the Clock-Master. The library suport multiple instances for the multi-clock-master applcaiton. The clkcal class binds to the 
-post-processing callback for the CCP frame type handler and calculates the skew of the clock. 
+Precompiled library for Wireless Clock Calibration. This library for precompiled for Cortex class M3 devices. The Library work in conjunction with Clock Calibration Packets (CCP) sent by the Clock-Master. The library supports multiple instances for the multi-clock-master application. The clkcal class binds to the post-processing callback for the CCP frame type handler and calculates the skew of the clock. 
 
-The estimated skew is of type double and is accessable through the ccp instance ccp->clkcal->skew.
-
-The underlying algorithms is a double procession square root implemenation of an extended kalamn estimator.
+The estimated skew is of type double and is accessible through the CCP instance ccp->clkcal->skew.
 
 cfgsys:
     DW1000_CLOCK_CALIBRATION: = 1   // Enable CCP backed handler
@@ -37,4 +34,4 @@ cfgsys:
     TIMESCALE: = 0                  // Defaults to linear interpolation algorithm, required for TWR class applications
 
 dependencies:
-    CCP_PERIOD:                     // CCP smaple period, definded within core drivers. 
+    CCP_PERIOD:                     // sample period, defined within core drivers. 
