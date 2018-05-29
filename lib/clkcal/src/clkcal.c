@@ -91,8 +91,8 @@ clkcal_init(clkcal_instance_t * inst,  dw1000_ccp_instance_t * ccp){
     inst->ccp = (void *) ccp;
 
 #if MYNEWT_VAL(TIMESCALE)
-    double x0[] = {0,(double)((uint64_t)inst->period * (1 <<16))};
-    inst->q[0] = MYNEWT_VAL(TIMESCALE_QVAR);
+    double x0[] = {0};
+    inst->q[0] = MYNEWT_VAL(TIMESCALE_QVAR) * 1.0;
     inst->q[1] = MYNEWT_VAL(TIMESCALE_QVAR) * 0.1;
     inst->r[0] = MYNEWT_VAL(TIMESCALE_RVAR);
     double T = 1e-6 * inst->period;   // peroid in sec
@@ -159,7 +159,6 @@ static void ccp_complate_cb(struct os_event * ev){
         inst->nT = (int16_t)frame->seq_num - (int16_t)previous_frame->seq_num;
         inst->nT = (inst->nT < 0)?0x100+inst->nT:inst->nT;
        
-
 #if MYNEWT_VAL(TIMESCALE) 
         timescale_instance_t * timescale = inst->timescale; 
         timescale_states_t * states = (timescale_states_t *) (inst->timescale->eke->x); 

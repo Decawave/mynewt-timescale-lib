@@ -21,12 +21,12 @@
 syscfg.defs:
     TIMESCALE:
         description: 'Enable clock estimation'
-        value: 1
+        value: 0
         restrictions: CLOCK_CALIBRATION
     TIMESCALE_QVAR:
         description: 'Model Variance'
-        value: ((double){1.73e-9})
+        value: ((double){128e6*512*3e-20})
     TIMESCALE_RVAR:
         description: 'Observation Variance'
-        value: ((double){1.73e-6})
+        value: ((double){128e6*512*6e-20})
 
