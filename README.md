@@ -28,10 +28,10 @@ Precompiled library for Wireless Clock Calibration. This library for precompiled
 The estimated skew is of type double and is accessible through the CCP instance ccp->clkcal->skew.
 
 cfgsys:
-*    DW1000_CLOCK_CALIBRATION: = 1   // Enable CCP backed handler
-*    CLOCK_CALIBRATION: = 1          // Enable clkcal pkg
-*    TIMESCALE: = 1                  // Time scale processing algorithm, required for TDOA class applcaitons
-*    TIMESCALE: = 0                  // Defaults to linear interpolation algorithm, required for TWR class applications
+*    DW1000_CCP_ENABLED: = 1                 // Enable CCP frame handler
+*    CLOCK_CALIBRATION_ENABLED: = 1          // Enable clkcal pkg
+*    TIMESCALE_PROCESSING_ENABLED: = 1       // Time-scale processing algorithm, required for TDOA class applcaitons
+*    TIMESCALE_PROCESSING_ENABLED: = 0       // Defaults to linear interpolation algorithm, required for TWR class applications
 
 dependencies:
 *    CCP_PERIOD:                     // sample period, defined within core drivers. 

@@ -50,11 +50,11 @@
 #include <dw1000/dw1000_ftypes.h>
 #include <dw1000/dw1000_ccp.h>
 #include <clkcal/clkcal.h>
-#if MYNEWT_VAL(TIMESCALE)
+#if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED)
 #include <timescale/timescale.h>
 #endif
 
-#if MYNEWT_VAL(CLOCK_CALIBRATION)
+#if MYNEWT_VAL(CLOCK_CALIBRATION_ENABLED)
 
 static void ccp_complate_cb(struct os_event * ev);
 static void clkcal_postprocess(struct os_event * ev);
@@ -90,17 +90,18 @@ clkcal_init(clkcal_instance_t * inst,  dw1000_ccp_instance_t * ccp){
     };
     inst->ccp = (void *) ccp;
 
-#if MYNEWT_VAL(TIMESCALE)
+#if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED)
     double x0[] = {0};
     inst->q[0] = MYNEWT_VAL(TIMESCALE_QVAR) * 1.0;
     inst->q[1] = MYNEWT_VAL(TIMESCALE_QVAR) * 0.1;
     inst->r[0] = MYNEWT_VAL(TIMESCALE_RVAR);
     double T = 1e-6 * inst->period;   // peroid in sec
     inst->timescale = timescale_init(NULL, x0, inst->q, T); 
+    inst->timescale->status.initialized = 0; //Ignore X0 values, until we get first event
 #endif
 
     dw1000_ccp_set_postprocess(ccp, ccp_complate_cb);
-    clkcal_set_postprocess(inst,clkcal_postprocess);
+    clkcal_set_postprocess(inst, clkcal_postprocess);
 
     inst->status.initialized = 1;
     return inst;
@@ -124,7 +125,7 @@ clkcal_free(clkcal_instance_t * inst){
 
     dw1000_ccp_set_postprocess((dw1000_ccp_instance_t *)inst->ccp, NULL);
 
-#if MYNEWT_VAL(TIMESCALE)
+#if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED)
         timescale_free(inst->timescale);
 #endif
     if (inst->status.selfmalloc)
@@ -152,27 +153,30 @@ static void ccp_complate_cb(struct os_event * ev){
     dw1000_ccp_instance_t * ccp = (dw1000_ccp_instance_t *)ev->ev_arg;
     clkcal_instance_t * inst = ccp->clkcal;
 
-#if MYNEWT_VAL(DW1000_CLOCK_CALIBRATION)    
+#if MYNEWT_VAL(DW1000_CCP_ENABLED)    
     if(ccp->status.valid){ 
         ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
         ccp_frame_t * frame = ccp->frames[(ccp->idx)%ccp->nframes]; 
         inst->nT = (int16_t)frame->seq_num - (int16_t)previous_frame->seq_num;
         inst->nT = (inst->nT < 0)?0x100+inst->nT:inst->nT;
        
-#if MYNEWT_VAL(TIMESCALE) 
+#if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED) 
         timescale_instance_t * timescale = inst->timescale; 
         timescale_states_t * states = (timescale_states_t *) (inst->timescale->eke->x); 
         
-        if (inst->status.valid == 0){
+        if (inst->status.initialized == 0){
             states->time = frame->reception_timestamp;
             states->skew = ((double) ((uint64_t)1 << 16)) / 1e-6; 
+            inst->status.initialized = 1;
         }
         double T = 1e-6 * inst->period * inst->nT;   // peroid in sec
-        inst->status.valid = timescale_main(timescale, frame->reception_timestamp, inst->q, inst->r, T).initialized;
+        inst->status.valid = timescale_main(timescale, frame->reception_timestamp, inst->q, inst->r, T).valid;
         inst->skew = states->skew * (1e-6/(1 << 16));
+        inst->epoch = frame->reception_timestamp;
 #else
         uint64_t interval = (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFF;
         inst->skew = (double) interval / (double)(inst->nT * ((uint64_t)inst->period * (1 <<16)));
+        inst->epoch = frame->reception_timestamp;
 #endif
     }
 #endif
@@ -231,7 +235,7 @@ clkcal_postprocess(struct os_event * ev){
     );
 }
 
-#endif // MYNEWT_VAL(CLOCK_CALIBRATION)
+#endif // MYNEWT_VAL(CLOCK_CALIBRATION_ENABLED)
 
 
 
