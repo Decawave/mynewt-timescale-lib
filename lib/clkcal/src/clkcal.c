@@ -169,9 +169,9 @@ static void ccp_complate_cb(struct os_event * ev){
             states->skew = ((double) ((uint64_t)1 << 16)) / 1e-6; 
             inst->status.initialized = 1;
         }
-        double T = 1e-6 * inst->period * inst->nT;   // peroid in sec
+        double T = 1e-6l * inst->period * inst->nT;   // peroid in sec
         inst->status.valid = timescale_main(timescale, frame->reception_timestamp, inst->q, inst->r, T).valid;
-        inst->skew = states->skew * (1e-6/(1 << 16));
+        inst->skew = states->skew * (1e-6l/(1 << 16));
         inst->epoch = frame->reception_timestamp;
 #else
         uint64_t interval = (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFF;
