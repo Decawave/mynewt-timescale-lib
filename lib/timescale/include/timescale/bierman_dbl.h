@@ -1,11 +1,11 @@
-/**
+/*
  * Copyright 2017 Paul Kettle
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-#ifndef CONFIG_INCLUDE
-#define CONFIG_INCLUDE
-// the configured options 
-#define VERSION_MAJOR 1
-#define VERSION_MINOR 0
-#define VERSION_PATCH 0
+/**
+ * @file bierman_dbl.h
+ * @author Paul Kettle
+ * @date July 24 2017
+ * @brief Berman Factorization, square root filtering without square roots
+ *  \cite bierman2006factorization
+ *
+ */
+
+#ifndef BIERMAN_DBL_INCLUDE
+#define BIERMAN_DBL_INCLUDE
+
+#include <stdint.h>
+#include <stdlib.h>
+
+void bierman_dbl(double z, double r, double H[], double x[], double UP[], double DP[], uint16_t n);
+
 #endif
+
 
