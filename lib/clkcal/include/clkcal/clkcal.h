@@ -32,7 +32,7 @@
 extern "C" {
 #endif
 
-#if MYNEWT_VAL(TIMESCALE)
+#if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED)
 #include <timescale/timescale.h>        
 #endif
 
@@ -56,15 +56,16 @@ typedef struct _clkcal_instance_t{
     clkcal_control_t control;
     clkcal_config_t config;
     struct _dw1000_cpp_instance_t * ccp;
-#if MYNEWT_VAL(TIMESCALE)
+#if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED)
     struct _timescale_instance_t * timescale;
     double x0[TIMESCALE_N];
     double q[TIMESCALE_N];
     double r[TIMESCALE_M];
 #endif
     int16_t nT;
-    double skew;
+    uint64_t epoch;
     uint32_t period;
+    double skew;
     struct os_callout callout_postprocess;
 }clkcal_instance_t; 
 

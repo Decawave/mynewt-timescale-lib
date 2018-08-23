@@ -19,8 +19,19 @@
 #
 -->
 
-# Decawave c
+# Decawave wireless clock sync lib
 
 ## Overview
 
-Precompiled library for ccp timescale processing. The library for build for Cortex class M3 devices.
+Precompiled library for Wireless Clock Calibration. This library for precompiled for Cortex class M3 devices. The Library work in conjunction with Clock Calibration Packets (CCP) sent by the Clock-Master. The library supports multiple instances for the multi-clock-master application. The clkcal class binds to the post-processing callback for the CCP frame type handler and calculates the skew of the clock. 
+
+The estimated skew is of type double and is accessible through the CCP instance ccp->clkcal->skew.
+
+cfgsys:
+*    DW1000_CCP_ENABLED: = 1                 // Enable CCP frame handler
+*    CLOCK_CALIBRATION_ENABLED: = 1          // Enable clkcal pkg
+*    TIMESCALE_PROCESSING_ENABLED: = 1       // Time-scale processing algorithm, required for TDOA class applcaitons
+*    TIMESCALE_PROCESSING_ENABLED: = 0       // Defaults to linear interpolation algorithm, required for TWR class applications
+
+dependencies:
+*    CCP_PERIOD:                     // sample period, defined within core drivers. 

@@ -33,5 +33,5 @@ pkg.cflags:
 
 pkg.deps:
     - "@mynewt-dw1000-core/hw/drivers/dw1000"
-pkg.deps.CLOCK_CALIBRATION:
+pkg.deps.CLOCK_CALIBRATION_ENABLED:
     - "@mynewt-dw1000-core/hw/drivers/dw1000"

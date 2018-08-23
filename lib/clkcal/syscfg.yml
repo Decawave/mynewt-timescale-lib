@@ -19,10 +19,10 @@
 # Package: lib/clkcal
 
 syscfg.defs:
-    CLOCK_CALIBRATION:
+    CLOCK_CALIBRATION_ENABLED:
         description: 'Enable clock estimation'
         value: 0
-        restrictions: DW1000_CLOCK_CALIBRATION
+        restrictions: DW1000_CCP_ENABLED
         restrictions: CCP_PERIOD
  
   
