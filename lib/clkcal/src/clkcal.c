@@ -166,7 +166,7 @@ static void ccp_complate_cb(struct os_event * ev){
         
         if (inst->status.initialized == 0){
             states->time = frame->reception_timestamp;
-            states->skew = ((double) ((uint64_t)1 << 16)) / 1e-6; 
+            states->skew = ((double) ((uint64_t)1 << 16)) / 1e-6l; 
             inst->status.initialized = 1;
         }
         double T = 1e-6l * inst->period * inst->nT;   // peroid in sec
@@ -181,9 +181,8 @@ static void ccp_complate_cb(struct os_event * ev){
     }
 #endif
     if (inst->config.postprocess) 
-        os_eventq_put(os_eventq_dflt_get(), &inst->callout_postprocess.c_ev);
+        os_eventq_put(os_eventq_dflt_get(), &inst->clkcal_postprocess_ev);
 }
-
 
 /*! 
  * @fn clkcal_set_postprocess(clkcal_instance_t * inst * inst, os_event_fn * ccp_postprocess)
@@ -192,13 +191,14 @@ static void ccp_complate_cb(struct os_event * ev){
  * or an advanced timescale processing algorithm.
  * 
  * input parameters
- * @param inst - dw1000_dev_instance_t * 
+ * @param inst - clkcal_instance_t *
  *
  * returns none
  */
 void 
 clkcal_set_postprocess(clkcal_instance_t * inst, os_event_fn * postprocess){
-    os_callout_init(&inst->callout_postprocess, os_eventq_dflt_get(), postprocess, (void *) inst);
+    inst->clkcal_postprocess_ev.ev_cb = postprocess;
+    inst->clkcal_postprocess_ev.ev_arg = (void *)inst;
     inst->config.postprocess = true;
 }
 
