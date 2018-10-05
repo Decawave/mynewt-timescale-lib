@@ -175,11 +175,7 @@ void clkcal_update_cb(struct os_event * ev){
         
         if (inst->status.initialized == 0 ){
             states->time = frame->reception_timestamp;
-<<<<<<< HEAD
             states->skew = ((double) ((uint64_t)1 << 16) / 1e-6l); 
-=======
-            states->skew = ((double) ((uint64_t)1 << 16)) / 1e-6l; 
->>>>>>> a896232492b2d272d78918f9a6aeb9c36ba5b048
             inst->status.initialized = 1;
         }else{
             double T = 1e-6l * inst->period * inst->nT;   // peroid in sec
