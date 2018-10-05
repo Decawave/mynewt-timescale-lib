@@ -48,15 +48,20 @@
 #include <dw1000/dw1000_mac.h>
 #include <dw1000/dw1000_phy.h>
 #include <dw1000/dw1000_ftypes.h>
-#include <dw1000/dw1000_ccp.h>
+#include <ccp/dw1000_ccp.h>
 #include <clkcal/clkcal.h>
 #if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED)
 #include <timescale/timescale.h>
 #endif
 
+//#define DIAGMSG(s,u) printf(s,u)
+#ifndef DIAGMSG
+#define DIAGMSG(s,u)
+#endif
+
 #if MYNEWT_VAL(CLOCK_CALIBRATION_ENABLED)
 
-static void ccp_complate_cb(struct os_event * ev);
+void clkcal_update_cb(struct os_event * ev);
 static void clkcal_postprocess(struct os_event * ev);
 
 /*! 
@@ -95,15 +100,17 @@ clkcal_init(clkcal_instance_t * inst,  dw1000_ccp_instance_t * ccp){
     inst->q[0] = MYNEWT_VAL(TIMESCALE_QVAR) * 1.0;
     inst->q[1] = MYNEWT_VAL(TIMESCALE_QVAR) * 0.1;
     inst->r[0] = MYNEWT_VAL(TIMESCALE_RVAR);
-    double T = 1e-6 * inst->period;   // peroid in sec
+    double T = 1e-6l * inst->period;   // peroid in sec
     inst->timescale = timescale_init(NULL, x0, inst->q, T); 
     inst->timescale->status.initialized = 0; //Ignore X0 values, until we get first event
 #endif
 
-    dw1000_ccp_set_postprocess(ccp, ccp_complate_cb);
+    inst->skew = 1.0f;
+
+    dw1000_ccp_set_postprocess(ccp, clkcal_update_cb);
     clkcal_set_postprocess(inst, clkcal_postprocess);
 
-    inst->status.initialized = 1;
+    inst->status.initialized = 0;
     return inst;
 }
 
@@ -135,7 +142,7 @@ clkcal_free(clkcal_instance_t * inst){
 }
 
 /*! 
- * @fn ccp_complate_cb(struct os_event * ev)
+ * @fn clkcal_update_cb(struct os_event * ev)
  *
  * @brief This function serves as a placeholder for clkcal updates based on ccp observation. The clkcal thread uses timescale 
  * if available otherwise defaults to linear interpolation. Once complete a post-process event is invoked.     
@@ -147,16 +154,18 @@ clkcal_free(clkcal_instance_t * inst){
  *
  * returns none 
  */
-static void ccp_complate_cb(struct os_event * ev){
+void clkcal_update_cb(struct os_event * ev){
     assert(ev != NULL);
     assert(ev->ev_arg != NULL);
     dw1000_ccp_instance_t * ccp = (dw1000_ccp_instance_t *)ev->ev_arg;
     clkcal_instance_t * inst = ccp->clkcal;
 
+    DIAGMSG("{\"utime\": %lu,\"msg\": \"clkcal_update_cb\"}\n",os_cputime_ticks_to_usecs(os_cputime_get32()));
+
 #if MYNEWT_VAL(DW1000_CCP_ENABLED)    
     if(ccp->status.valid){ 
-        ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
-        ccp_frame_t * frame = ccp->frames[(ccp->idx)%ccp->nframes]; 
+        ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-2)%ccp->nframes]; 
+        ccp_frame_t * frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
         inst->nT = (int16_t)frame->seq_num - (int16_t)previous_frame->seq_num;
         inst->nT = (inst->nT < 0)?0x100+inst->nT:inst->nT;
        
@@ -164,20 +173,22 @@ static void ccp_complate_cb(struct os_event * ev){
         timescale_instance_t * timescale = inst->timescale; 
         timescale_states_t * states = (timescale_states_t *) (inst->timescale->eke->x); 
         
-        if (inst->status.initialized == 0){
+        if (inst->status.initialized == 0 ){
             states->time = frame->reception_timestamp;
-            states->skew = ((double) ((uint64_t)1 << 16)) / 1e-6; 
+            states->skew = ((double) ((uint64_t)1 << 16) / 1e-6l); 
             inst->status.initialized = 1;
+        }else{
+            double T = 1e-6l * inst->period * inst->nT;   // peroid in sec
+//          uint32_t tic = os_cputime_ticks_to_usecs(os_cputime_get32());
+            inst->status.valid = timescale_main(timescale, ccp->epoch, inst->q, inst->r, T).valid;
+//          uint32_t toc = os_cputime_ticks_to_usecs(os_cputime_get32());
+//          printf("{\"utime\": %lu,\"timescale_main_tic_toc\": %lu}\n",toc,toc-tic);
         }
-        double T = 1e-6l * inst->period * inst->nT;   // peroid in sec
-        inst->status.valid = timescale_main(timescale, frame->reception_timestamp, inst->q, inst->r, T).valid;
-        inst->skew = states->skew * (1e-6l/(1 << 16));
-        inst->epoch = frame->reception_timestamp;
-#else
-        uint64_t interval = (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFF;
-        inst->skew = (double) interval / (double)(inst->nT * ((uint64_t)inst->period * (1 <<16)));
-        inst->epoch = frame->reception_timestamp;
-#endif
+        inst->skew = states->skew * (1e-6l/((uint64_t)1 << 16));
+#else 
+        uint64_t interval = (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFFULL;
+        inst->skew = (double) interval / (double)(inst->nT * ((uint64_t)inst->period * ((uint64_t)1 <<16)));
+#endif 
     }
 #endif
     if (inst->config.postprocess) 
@@ -221,13 +232,13 @@ clkcal_postprocess(struct os_event * ev){
 
     clkcal_instance_t * inst = (clkcal_instance_t *)ev->ev_arg;
     dw1000_ccp_instance_t * ccp = (void *)inst->ccp; 
-    ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
-    ccp_frame_t * frame = ccp->frames[(ccp->idx)%ccp->nframes]; 
+    ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-2)%ccp->nframes]; 
+    ccp_frame_t * frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
 
-     printf("{\"utime\":%lu,\"ccp\":[%llu,%llu],\"skew\":%llu,\"nT\":[%d,%d,%d]}\n", 
+     printf("{\"utime\": %lu,\"clkcal\": [%llu,%llu],\"skew\": %llu,\"nT\": [%d,%d,%d]}\n", 
         os_cputime_ticks_to_usecs(os_cputime_get32()),
         frame->reception_timestamp,
-        (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFF,
+        (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFFFULL,
         *(uint64_t *)&inst->skew,
         inst->nT,
         frame->seq_num,

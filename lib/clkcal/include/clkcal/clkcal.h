@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <os/os.h>
 #include <dw1000/dw1000_dev.h>
-#include <dw1000/dw1000_ccp.h>
+#include <ccp/dw1000_ccp.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -63,7 +63,6 @@ typedef struct _clkcal_instance_t{
     double r[TIMESCALE_M];
 #endif
     int16_t nT;
-    uint64_t epoch;
     uint32_t period;
     double skew;
     struct os_callout callout_postprocess;
@@ -73,6 +72,7 @@ typedef struct _clkcal_instance_t{
 clkcal_instance_t * clkcal_init(clkcal_instance_t * inst, struct _dw1000_ccp_instance_t * ccp);
 void clkcal_free(clkcal_instance_t * inst);
 void clkcal_set_postprocess(clkcal_instance_t * inst, os_event_fn * postprocess); 
+void clkcal_update_cb(struct os_event * ev);
 
 #ifdef __cplusplus
 }
