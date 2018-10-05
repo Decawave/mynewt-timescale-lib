@@ -23,11 +23,11 @@
  */
 
 
-#ifndef _TIMESCALE_H_
-#define _TIMESCALE_H_
+#ifndef TIMESCALE_INCLUDE
+#define TIMESCALE_INCLUDE
 
 #include <stdint.h>
-#include "srkf.h"
+#include "srkf_dbl.h"
 
 #define TIMESCALE_N (sizeof(timescale_states_t)/sizeof(double))
 #define TIMESCALE_M (sizeof(timescale_observations_t)/sizeof(double))
@@ -55,7 +55,7 @@ typedef struct _timescale_status_t{
 }timescale_status_t;
 
 typedef struct _timescale_instance_t{
-    srkf_instance_t * eke;        /**< Extended Kalman base class ptr */
+    srkf_dbl_instance_t * eke;        /**< Extended Kalman base class ptr */
     timescale_status_t status; /**< Instance status */
 }timescale_instance_t;
 

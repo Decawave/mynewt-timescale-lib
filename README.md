@@ -23,14 +23,14 @@
 
 ## Overview
 
-Precompiled library for Wireless Clock Calibration. This library for precompiled for Cortex class M3 devices. The Library work in conjunction with Clock Calibration Packets (CCP) sent by the Clock-Master. The library supports multiple instances for the multi-clock-master application. The clkcal class binds to the post-processing callback for the CCP frame type handler and calculates the skew of the clock. 
+Precompiled library for Clock Calibration. This library is precompiled for Cortex class M3 devices. The Library works in conjunction with Clock Calibration Packets (CCP) sent by the Clock-Master. The library supports multiple instances for multi-clock-master applications. The clkcal class binds to the post-processing callback for the CCP frame type handler and calculates the skew of the clock. This library is a dependent repo and is included as required.
 
 The estimated skew is of type double and is accessible through the CCP instance ccp->clkcal->skew.
 
 cfgsys:
 *    DW1000_CCP_ENABLED: = 1                 // Enable CCP frame handler
 *    CLOCK_CALIBRATION_ENABLED: = 1          // Enable clkcal pkg
-*    TIMESCALE_PROCESSING_ENABLED: = 1       // Time-scale processing algorithm, required for TDOA class applcaitons
+*    TIMESCALE_PROCESSING_ENABLED: = 1       // Time-scale processing algorithm, required for TDOA class applicatons
 *    TIMESCALE_PROCESSING_ENABLED: = 0       // Defaults to linear interpolation algorithm, required for TWR class applications
 
 dependencies:

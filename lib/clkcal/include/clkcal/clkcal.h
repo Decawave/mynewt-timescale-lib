@@ -65,7 +65,8 @@ typedef struct _clkcal_instance_t{
     int16_t nT;
     uint32_t period;
     double skew;
-    struct os_callout callout_postprocess;
+//    struct os_callout callout_postprocess;
+    struct os_event clkcal_postprocess_ev;
 }clkcal_instance_t; 
 
 
