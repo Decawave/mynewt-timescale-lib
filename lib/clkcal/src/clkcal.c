@@ -162,7 +162,7 @@ void clkcal_update_cb(struct os_event * ev){
 
     DIAGMSG("{\"utime\": %lu,\"msg\": \"clkcal_update_cb\"}\n",os_cputime_ticks_to_usecs(os_cputime_get32()));
 
-#if MYNEWT_VAL(DW1000_CCP_ENABLED)    
+#if MYNEWT_VAL(CCP_ENABLED)    
     if(ccp->status.valid){ 
         ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-2)%ccp->nframes]; 
         ccp_frame_t * frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
