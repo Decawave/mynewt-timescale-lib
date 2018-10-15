@@ -48,7 +48,7 @@
 #include <dw1000/dw1000_mac.h>
 #include <dw1000/dw1000_phy.h>
 #include <dw1000/dw1000_ftypes.h>
-#include <ccp/dw1000_ccp.h>
+#include <ccp/ccp.h>
 #include <clkcal/clkcal.h>
 #if MYNEWT_VAL(TIMESCALE_PROCESSING_ENABLED)
 #include <timescale/timescale.h>

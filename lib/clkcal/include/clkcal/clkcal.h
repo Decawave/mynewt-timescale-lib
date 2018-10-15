@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <os/os.h>
 #include <dw1000/dw1000_dev.h>
-#include <ccp/dw1000_ccp.h>
+#include <ccp/ccp.h>
 
 #ifdef __cplusplus
 extern "C" {
