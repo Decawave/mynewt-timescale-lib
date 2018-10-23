@@ -34,7 +34,10 @@
 #define TIMESCALE_DYNAMICS 2
 
 typedef struct  _timescale_states_t{
+    union {
+    double offset;                            /**< Local time state */
     double time;                            /**< Local time state */
+    };
     double skew;                            /**< Skew parameter  */
 #if (TIMESCALE_DYNAMICS == 3)
     double drift;                           /**< Rate of change of Skew  */

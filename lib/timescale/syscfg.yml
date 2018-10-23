@@ -19,10 +19,10 @@
 # Package: lib/timescale
 
 syscfg.defs:
-    TIMESCALE_PROCESSING_ENABLED:
+    TIMESCALE_ENABLED:
         description: 'Enable clock estimation'
-        value: 0
-        restrictions: CLOCK_CALIBRATION_ENABLED
+        value: 1
+        restrictions: WCS_ENABLED
     TIMESCALE_QVAR:
         description: 'Model Variance'
         value: ((double){128e6*512*3e-20})
