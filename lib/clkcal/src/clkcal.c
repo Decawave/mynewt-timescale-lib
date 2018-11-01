@@ -230,12 +230,13 @@ clkcal_postprocess(struct os_event * ev){
     assert(ev != NULL);
     assert(ev->ev_arg != NULL);
 
+#if MYNEWT_VAL(CLOCK_CALIBRATION_VERBOSE)
     clkcal_instance_t * inst = (clkcal_instance_t *)ev->ev_arg;
     dw1000_ccp_instance_t * ccp = (void *)inst->ccp; 
     ccp_frame_t * previous_frame = ccp->frames[(ccp->idx-2)%ccp->nframes]; 
     ccp_frame_t * frame = ccp->frames[(ccp->idx-1)%ccp->nframes]; 
 
-     printf("{\"utime\": %lu,\"clkcal\": [%llu,%llu],\"skew\": %llu,\"nT\": [%d,%d,%d]}\n", 
+    printf("{\"utime\": %lu,\"clkcal\": [%llu,%llu],\"skew\": %llu,\"nT\": [%d,%d,%d]}\n",
         os_cputime_ticks_to_usecs(os_cputime_get32()),
         frame->reception_timestamp,
         (uint64_t)((uint64_t)(frame->reception_timestamp) - (uint64_t)(previous_frame->reception_timestamp)) & 0xFFFFFFFFFFULL,
@@ -244,6 +245,7 @@ clkcal_postprocess(struct os_event * ev){
         frame->seq_num,
         previous_frame->seq_num
     );
+#endif
 }
 
 #endif // MYNEWT_VAL(CLOCK_CALIBRATION_ENABLED)

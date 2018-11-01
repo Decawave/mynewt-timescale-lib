@@ -24,5 +24,6 @@ syscfg.defs:
         value: 0
         restrictions: DW1000_CCP_ENABLED
         restrictions: CCP_PERIOD
- 
-  
+    CLOCK_CALIBRATION_VERBOSE:
+        description: 'Enable json debug output'
+        value: 0
