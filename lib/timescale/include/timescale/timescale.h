@@ -56,6 +56,7 @@ typedef struct _timescale_status_t{
     uint16_t valid:1;
     uint16_t NotPositiveDefinitive:1;
     uint16_t rollover:1;
+    uint16_t halfperiod:1;
 }timescale_status_t;
 
 typedef struct _timescale_instance_t{
