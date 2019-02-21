@@ -65,8 +65,8 @@ typedef struct _srkf_dbl_instance_t{
 	double * _S;    /**< Scratch pad matrix, used for intermidiate P */
 	double * A;     /**< State Transition */
 	double * K;     /**< Gain Matrix */
-	void (*Aofx)(struct _srkf_dbl_instance_t * inst, double u[], double T);  /**< Callback function for Nonlinear state transition */
-	void (*JofAx)(struct _srkf_dbl_instance_t * inst, double u[], double T); /**< Callback function for Jocobian of state transition */
+	void (*Aofx)(struct _srkf_dbl_instance_t * inst, const double u[], double T);  /**< Callback function for Nonlinear state transition */
+	void (*JofAx)(struct _srkf_dbl_instance_t * inst, const double u[], double T); /**< Callback function for Jocobian of state transition */
 	void (*Hofx)(struct _srkf_dbl_instance_t * inst, double T);  /**< Callback function for Nonlinear measurement equation */
 	void (*JofHx)(struct _srkf_dbl_instance_t * inst, double T); /**< Callback function for Jocobian of measurement equation */
     void (*constraints)(struct _srkf_dbl_instance_t * inst, double T);    /**< Callback function constraints [optional] */
@@ -76,9 +76,9 @@ typedef struct _srkf_dbl_instance_t{
     srkf_dbl_ctrl_t ctrl;
 }srkf_dbl_instance_t;
 
-srkf_dbl_instance_t * srkf_dbl_init(srkf_dbl_instance_t * eke, double x0[], uint16_t n, uint16_t m);
+srkf_dbl_instance_t * srkf_dbl_init(srkf_dbl_instance_t * eke, const double x0[], uint16_t n, uint16_t m);
 void srkf_dbl_free(srkf_dbl_instance_t * eke);
-srkf_dbl_status_t srkf_dbl_main(srkf_dbl_instance_t * eke, double z[], double u[], double T, uint16_t flag);
+srkf_dbl_status_t srkf_dbl_main(srkf_dbl_instance_t * eke, const double z[], const double u[], double T, uint16_t flag);
 
 
 #endif

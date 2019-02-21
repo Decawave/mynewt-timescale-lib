@@ -32,7 +32,7 @@
 #define TIMESCALE_N (sizeof(timescale_states_t)/sizeof(double))
 #define TIMESCALE_M (sizeof(timescale_observations_t)/sizeof(double))
 #define TIMESCALE_DYNAMICS 3
-#define TIMESCALE_SKEW_OBSERVATION
+#undef TIMESCALE_SKEW_OBSERVATION
 
 typedef struct  _timescale_states_t{
     double time;                            /**< Local time state */
@@ -64,9 +64,9 @@ typedef struct _timescale_instance_t{
     timescale_status_t status; /**< Instance status */
 }timescale_instance_t;
 
-timescale_instance_t * timescale_init(timescale_instance_t * inst, double x0[], double q[], double T);
+timescale_instance_t * timescale_init(timescale_instance_t * inst, const double x0[], const double q[], double T);
 void timescale_free(timescale_instance_t * inst);
-timescale_status_t timescale_main(timescale_instance_t * inst, double z[], double q[], double r[], double T);
+timescale_status_t timescale_main(timescale_instance_t * inst, const double z[], const double q[], const double r[], double T);
 double timescale_forward(timescale_instance_t * inst, double T);
 double timescale_inverse(timescale_instance_t * inst, double T);
     

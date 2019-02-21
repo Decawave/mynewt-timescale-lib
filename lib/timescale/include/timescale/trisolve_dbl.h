@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-void trisolve_dbl(double x[], double U[], double y[], uint16_t n, uint16_t m);
+void trisolve_dbl(double x[], double U[], const double y[], uint16_t n, uint16_t m);
 
 #endif
 
