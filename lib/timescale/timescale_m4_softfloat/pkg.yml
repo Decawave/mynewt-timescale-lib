@@ -17,10 +17,10 @@
 # under the License.
 #
 
-pkg.name: lib/timescale
-pkg.description: Core algorithm for ccp timescale applicaitons 
+pkg.name: lib/timescale/timescale_m4_softfloat
+pkg.description: Soft-float version of core algorithm for ccp timescale applications 
 pkg.author: "Paul Kettle <Paul.Kettle@decawave.com>"
-pkg.homepage: "http://www.decawave.com]/"
+pkg.homepage: "http://www.decawave.com/"
 pkg.keywords:
     - dw1000
     - uwb
@@ -33,20 +33,3 @@ pkg.cflags:
 
 pkg.deps:
     - "@mynewt-dw1000-core/hw/drivers/dw1000"
-
-pkg.deps.'!HARDFLOAT':
-    - lib/timescale/timescale_m4_softfloat
-
-pkg.deps.'HARDFLOAT':
-    - lib/timescale/timescale_m4_hardfloat
-  
-# XXX Below inclusions depend on setting of the TIMESCALE_XXX variable
-pkg.deps.'TIMESCALE_M0':
-    - lib/timescale/timescale_m0
-
-pkg.deps.'TIMESCALE_M3':
-    - lib/timescale/timescale_m3
-
-pkg.deps.'TIMESCALE_XTENSA':
-    - lib/timescale/timescale_xtensa
-  

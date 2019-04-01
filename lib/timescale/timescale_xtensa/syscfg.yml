@@ -1,4 +1,3 @@
-#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -17,36 +16,11 @@
 # under the License.
 #
 
-pkg.name: lib/timescale
-pkg.description: Core algorithm for ccp timescale applicaitons 
-pkg.author: "Paul Kettle <Paul.Kettle@decawave.com>"
-pkg.homepage: "http://www.decawave.com]/"
-pkg.keywords:
-    - dw1000
-    - uwb
-    - ccp
-    - timescale
-    
-pkg.cflags:
-    - "-std=gnu99"
-    - "-fms-extensions"
+# Package: lib/timescale/timescale_xtensa
 
-pkg.deps:
-    - "@mynewt-dw1000-core/hw/drivers/dw1000"
+syscfg.defs:
+    TIMESCALE_ENABLED:
+        description: 'Enable clock estimation'
+        value: 1
+        restrictions: WCS_ENABLED
 
-pkg.deps.'!HARDFLOAT':
-    - lib/timescale/timescale_m4_softfloat
-
-pkg.deps.'HARDFLOAT':
-    - lib/timescale/timescale_m4_hardfloat
-  
-# XXX Below inclusions depend on setting of the TIMESCALE_XXX variable
-pkg.deps.'TIMESCALE_M0':
-    - lib/timescale/timescale_m0
-
-pkg.deps.'TIMESCALE_M3':
-    - lib/timescale/timescale_m3
-
-pkg.deps.'TIMESCALE_XTENSA':
-    - lib/timescale/timescale_xtensa
-  
