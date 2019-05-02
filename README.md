@@ -32,4 +32,3 @@ The timescale library implements wireless clock synchronization, when used in co
 | ------------- |:-------------:| -----:|
 | 1s CCP superframe  | In TDOA usercase  | 1-sigma 30 DTUs(~500ps) |
 
-

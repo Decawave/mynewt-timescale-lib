@@ -33,3 +33,23 @@ pkg.cflags:
 
 pkg.deps:
     - "@mynewt-dw1000-core/hw/drivers/dw1000"
+
+pkg.deps.'!HARDFLOAT':
+    - lib/timescale/timescale_m4_softfloat
+
+pkg.deps.'HARDFLOAT':
+    - lib/timescale/timescale_m4_hardfloat
+  
+# XXX Below inclusions depend on setting of the TIMESCALE_XXX variable
+pkg.deps.'TIMESCALE_M0':
+    - lib/timescale/timescale_m0
+
+pkg.deps.'TIMESCALE_M3':
+    - lib/timescale/timescale_m3
+
+pkg.deps.'TIMESCALE_M7':
+    - lib/timescale/timescale_m7
+    
+pkg.deps.'TIMESCALE_XTENSA':
+    - lib/timescale/timescale_xtensa
+  

@@ -1,3 +1,4 @@
+#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,13 +17,19 @@
 # under the License.
 #
 
-# Package: lib/timescale
+pkg.name: lib/timescale/timescale_m7
+pkg.description: cortex-m7 version of core algorithm for ccp timescale applications 
+pkg.author: "Paul Kettle <Paul.Kettle@decawave.com>"
+pkg.homepage: "http://www.decawave.com/"
+pkg.keywords:
+    - dw1000
+    - uwb
+    - ccp
+    - timescale
+    
+pkg.cflags:
+    - "-std=gnu99"
+    - "-fms-extensions"
 
-syscfg.defs:
-    TIMESCALE_QVAR:
-        description: 'Model Variance'
-        value: (128e6*512*3e-20)
-    TIMESCALE_RVAR:
-        description: 'Observation Variance'
-        value: (128e6*512*6e-20)
-
+pkg.deps:
+    - "@mynewt-dw1000-core/hw/drivers/dw1000"
