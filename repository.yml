@@ -19,8 +19,15 @@
 
 repo.name: mynewt-timescale-lib
 repo.versions:
-    "1.0.0": "master"
-    "1.0.0": "master"
+    "0.0.0": "master"
+    "1.0.0": "timescale_lib_1_0_0_tag"
 
     "0-latest": "1.0.0"    # 1.0.0
-    "0-dev": "1.0.0"       # master
+    "0-dev": "0.0.0"       # master
+
+repo.newt_compatibility:
+    # Allow all versions for 0.0.0.  This is a workaround to prevent a warning
+    # from being displayed when newt doesn't know which version of the repo is
+    # present.
+    0.0.0:
+        0.0.0: good
