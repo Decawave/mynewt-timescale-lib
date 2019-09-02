@@ -30,6 +30,3 @@ pkg.keywords:
 pkg.cflags:
     - "-std=gnu99"
     - "-fms-extensions"
-
-pkg.deps:
-    - "@mynewt-dw1000-core/hw/drivers/dw1000"

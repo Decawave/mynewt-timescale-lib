@@ -20,7 +20,7 @@
 pkg.name: lib/timescale
 pkg.description: Core algorithm for ccp timescale applicaitons 
 pkg.author: "Paul Kettle <Paul.Kettle@decawave.com>"
-pkg.homepage: "http://www.decawave.com]/"
+pkg.homepage: "http://www.decawave.com/"
 pkg.keywords:
     - dw1000
     - uwb
@@ -30,9 +30,6 @@ pkg.keywords:
 pkg.cflags:
     - "-std=gnu99"
     - "-fms-extensions"
-
-pkg.deps:
-    - "@mynewt-dw1000-core/hw/drivers/dw1000"
 
 pkg.deps.'!HARDFLOAT':
     - lib/timescale/timescale_m4_softfloat
