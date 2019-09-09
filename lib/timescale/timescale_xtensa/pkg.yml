@@ -22,7 +22,6 @@ pkg.description: Xtensa version of core algorithm for ccp timescale applications
 pkg.author: "Paul Kettle <Paul.Kettle@decawave.com>"
 pkg.homepage: "http://www.decawave.com/"
 pkg.keywords:
-    - dw1000
     - uwb
     - ccp
     - timescale
@@ -30,6 +29,3 @@ pkg.keywords:
 pkg.cflags:
     - "-std=gnu99"
     - "-fms-extensions"
-
-pkg.deps:
-    - "@mynewt-dw1000-core/hw/drivers/dw1000"
