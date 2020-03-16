@@ -21,8 +21,9 @@ repo.name: mynewt-timescale-lib
 repo.versions:
     "0.0.0": "master"
     "1.0.0": "timescale_lib_1_0_0_tag"
+    "1.0.1": "timescale_lib_1_0_1_tag"
 
-    "0-latest": "1.0.0"    # 1.0.0
+    "0-latest": "1.0.1"    # 1.0.0
     "0-dev": "0.0.0"       # master
 
 repo.newt_compatibility:
@@ -31,3 +32,8 @@ repo.newt_compatibility:
     # present.
     0.0.0:
         0.0.0: good
+
+    1.0.1:
+        1.7.0: good
+    1.0.0:
+        1.7.0: good
